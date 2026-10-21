@@ -1,0 +1,637 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>旅のイタリア語帳</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;0,6..96,700;1,6..96,500&family=Noto+Sans+JP:wght@400;500;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: one narrow column like a pocket phrasebook; tabs on top, a single card as the working surface, the list beneath */
+:root {
+  --bg: #eef3f4;
+  --surface: #ffffff;
+  --ink: #0f2a33;
+  --muted: #587079;
+  --line: #d3dfe2;
+  --accent: #0b6e7f;
+  --accent-ink: #ffffff;
+  --accent-soft: #dcecef;
+  --lemon: #f2c230;
+  --lemon-soft: #fbf0c6;
+  --good: #2b7d45;
+  --good-soft: #dff0e4;
+  --bad: #b3372a;
+  --bad-soft: #f7e0dc;
+  --f-display: "Bodoni Moda", "Didot", "Times New Roman", serif;
+  --f-body: "Noto Sans JP", "Hiragino Sans", "Yu Gothic", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0c181c; --surface: #13242a; --ink: #e2edef; --muted: #8fa7ae; --line: #22404a;
+    --accent: #4dc0d0; --accent-ink: #062026; --accent-soft: #163a42;
+    --lemon: #e9bd2c; --lemon-soft: #3a3214;
+    --good: #66c486; --good-soft: #173523; --bad: #f08273; --bad-soft: #42201b;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0c181c; --surface: #13242a; --ink: #e2edef; --muted: #8fa7ae; --line: #22404a;
+  --accent: #4dc0d0; --accent-ink: #062026; --accent-soft: #163a42;
+  --lemon: #e9bd2c; --lemon-soft: #3a3214;
+  --good: #66c486; --good-soft: #173523; --bad: #f08273; --bad-soft: #42201b;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 20px 48px;
+}
+.wrap { max-width: 640px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
+header { display: flex; flex-direction: column; gap: 2px; }
+.eyebrow { font-family: var(--f-mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+h1 { font-family: var(--f-display); font-weight: 700; font-size: clamp(28px, 7vw, 40px); line-height: 1.1; margin: 0; text-wrap: balance; }
+h1 span { font-family: var(--f-body); font-weight: 700; font-size: .55em; margin-left: 6px; color: var(--muted); }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.tabs { display: grid; grid-template-columns: 1fr 1fr; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 4px; gap: 4px; }
+.tabs button { border: 0; background: transparent; padding: 10px; border-radius: 9px; font-weight: 700; color: var(--muted); }
+.tabs button[aria-selected="true"] { background: var(--accent); color: var(--accent-ink); }
+
+.toolbar { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; justify-content: space-between; }
+.chips { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: thin; max-width: 100%; }
+.chip { flex: none; border: 1px solid var(--line); background: var(--surface); padding: 5px 12px; border-radius: 999px; font-size: 13px; white-space: nowrap; }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.chip small { font-family: var(--f-mono); font-size: 11px; opacity: .7; margin-left: 4px; }
+.opts { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; font-size: 13px; color: var(--muted); }
+.opts label { display: inline-flex; align-items: center; gap: 6px; }
+select { font: inherit; font-size: 13px; padding: 4px 8px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.seg button { border: 0; background: var(--surface); padding: 4px 10px; font-size: 13px; color: var(--muted); }
+.seg button[aria-pressed="true"] { background: var(--accent-soft); color: var(--ink); font-weight: 700; }
+
+.card {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 16px;
+  padding: 22px 20px 18px; display: flex; flex-direction: column; gap: 16px; position: relative;
+}
+.meta { display: flex; justify-content: space-between; align-items: center; font-family: var(--f-mono); font-size: 12px; color: var(--muted); }
+.flash { min-height: 200px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 10px; border: 0; background: transparent; padding: 8px 0; width: 100%; }
+.it { font-family: var(--f-display); font-weight: 500; font-size: clamp(26px, 7vw, 38px); line-height: 1.2; text-wrap: balance; overflow-wrap: anywhere; }
+.ja-big { font-weight: 700; font-size: clamp(20px, 5.5vw, 28px); line-height: 1.35; text-wrap: balance; }
+.kana { font-size: 14px; color: var(--muted); letter-spacing: .04em; }
+.ja { font-size: 18px; font-weight: 500; }
+.note { font-size: 12.5px; color: var(--muted); background: var(--accent-soft); padding: 4px 10px; border-radius: 6px; max-width: 46ch; }
+.hint { font-size: 12px; color: var(--muted); }
+.back { display: flex; flex-direction: column; gap: 6px; align-items: center; padding-top: 12px; border-top: 1px dashed var(--line); width: min(100%, 420px); }
+.known-tag { position: absolute; top: 14px; right: 16px; }
+
+.controls { display: grid; grid-template-columns: auto 1fr 1fr auto; gap: 8px; }
+.btn { border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 10px 14px; font-weight: 500; display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; }
+.btn:hover { border-color: var(--accent); }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.btn.lemon[aria-pressed="true"] { background: var(--lemon-soft); border-color: var(--lemon); }
+.btn svg { width: 18px; height: 18px; fill: currentColor; flex: none; }
+.btn.big { min-height: 64px; font-size: 16px; border-radius: 14px; }
+
+.pill { font-family: var(--f-mono); font-size: 11px; padding: 2px 8px; border-radius: 999px; background: var(--lemon-soft); color: var(--ink); border: 1px solid var(--lemon); }
+
+.list { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+.list h2 { font-size: 13px; margin: 0; padding: 12px 16px; border-bottom: 1px solid var(--line); color: var(--muted); font-weight: 500; display: flex; justify-content: space-between; }
+.row { display: grid; grid-template-columns: 36px 1fr auto; gap: 10px; align-items: center; padding: 10px 12px 10px 8px; border-bottom: 1px solid var(--line); }
+.row:last-child { border-bottom: 0; }
+.row.current { background: var(--accent-soft); }
+.row > div { min-width: 0; }
+.row .r-it { font-family: var(--f-display); font-size: 18px; line-height: 1.25; overflow-wrap: anywhere; }
+.row .r-ja { font-size: 13px; color: var(--muted); }
+.icon-btn { border: 0; background: transparent; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; color: var(--accent); }
+.icon-btn:hover { background: var(--accent-soft); }
+.icon-btn svg { width: 18px; height: 18px; fill: currentColor; }
+.row .jump { border: 0; background: transparent; text-align: left; padding: 0; }
+.dot { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid var(--line); }
+.dot.on { background: var(--lemon); border-color: var(--lemon); }
+
+.score { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.stat { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+.stat b { display: block; font-family: var(--f-mono); font-size: 22px; font-variant-numeric: tabular-nums; }
+.stat span { font-size: 12px; color: var(--muted); }
+.listen-row { display: grid; grid-template-columns: 2fr 1fr; gap: 8px; }
+.choices { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.choice { border: 1px solid var(--line); background: var(--surface); border-radius: 12px; padding: 12px; text-align: left; min-height: 56px; display: flex; gap: 10px; align-items: center; }
+.choice .k { font-family: var(--f-mono); font-size: 11px; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; flex: none; }
+.choice.itc .t { font-family: var(--f-display); font-size: 17px; }
+.choice:hover:not(:disabled) { border-color: var(--accent); }
+.choice:disabled { cursor: default; }
+.choice.right { background: var(--good-soft); border-color: var(--good); }
+.choice.wrong { background: var(--bad-soft); border-color: var(--bad); }
+.result { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 4px; padding: 12px; border-radius: 12px; }
+.result.ok { background: var(--good-soft); }
+.result.ng { background: var(--bad-soft); }
+.result .verdict { font-weight: 700; font-size: 14px; }
+.result.ok .verdict { color: var(--good); }
+.result.ng .verdict { color: var(--bad); }
+.voice-warn { font-size: 13px; background: var(--bad-soft); border: 1px solid var(--bad); border-radius: 10px; padding: 10px 12px; }
+.empty { text-align: center; color: var(--muted); padding: 30px 10px; }
+footer { font-size: 12px; color: var(--muted); text-align: center; }
+
+@media (max-width: 460px) {
+  .controls { grid-template-columns: 1fr 1fr; }
+  .choices { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .back { animation: rise .18s ease-out; }
+  @keyframes rise { from { opacity: .3; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Frasario di viaggio · 旅行フレーズ 105</div>
+    <h1>Parliamo! <span>旅のイタリア語帳</span></h1>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button id="tab-cards" role="tab" aria-selected="true">単語帳</button>
+    <button id="tab-listen" role="tab" aria-selected="false">ヒアリング</button>
+  </div>
+
+  <div id="voiceWarn" class="voice-warn" hidden>この端末のブラウザにはイタリア語の音声が見つかりませんでした。別の声で読み上げられる場合があります。iPhoneは「設定 › アクセシビリティ › 読み上げコンテンツ › 声」、Androidは「Google音声サービス」からイタリア語を追加すると正しく再生されます。</div>
+
+  <div class="toolbar">
+    <div class="chips" id="chips"></div>
+    <div class="opts">
+      <label for="rate">読み上げ速度
+        <select id="rate">
+          <option value="0.6">ゆっくり</option>
+          <option value="0.8" selected>ふつう</option>
+          <option value="1">ネイティブ</option>
+        </select>
+      </label>
+    </div>
+  </div>
+
+  <!-- 単語帳 -->
+  <section id="view-cards" style="display:flex;flex-direction:column;gap:18px">
+    <div class="opts">
+      <span class="seg" id="dirSeg">
+        <button data-dir="it" aria-pressed="true">伊 → 日</button>
+        <button data-dir="ja" aria-pressed="false">日 → 伊</button>
+      </span>
+      <label><input type="checkbox" id="hideKnown"> 覚えた単語を隠す</label>
+      <label><input type="checkbox" id="autoPlay" checked> カードを開いたら読み上げ</label>
+    </div>
+
+    <div class="card" id="card"></div>
+
+    <div class="list">
+      <h2><span id="listTitle">一覧</span><span id="knownCount"></span></h2>
+      <div id="list"></div>
+    </div>
+  </section>
+
+  <!-- ヒアリング -->
+  <section id="view-listen" hidden style="flex-direction:column;gap:18px">
+    <div class="opts">
+      <span>答え方</span>
+      <span class="seg" id="modeSeg">
+        <button data-mode="ja" aria-pressed="true">意味を選ぶ</button>
+        <button data-mode="it" aria-pressed="false">つづりを選ぶ</button>
+      </span>
+    </div>
+    <div class="score">
+      <div class="stat"><b id="sRight">0</b><span>正解</span></div>
+      <div class="stat"><b id="sRate">–</b><span>正答率</span></div>
+      <div class="stat"><b id="sStreak">0</b><span>連続正解</span></div>
+    </div>
+    <div class="card" id="quiz"></div>
+    <div class="list" id="missBox" hidden>
+      <h2><span>間違えたフレーズ</span><span id="missCount"></span></h2>
+      <div id="missList"></div>
+    </div>
+  </section>
+
+  <footer>音声はブラウザの読み上げ機能を使います。覚えた単語の記録はこのブラウザにだけ保存されます。</footer>
+</div>
+
+<script>
+const CATS = [
+  { id: "all", name: "すべて" },
+  { id: "greet", name: "あいさつ" },
+  { id: "num", name: "数字・時間" },
+  { id: "food", name: "レストラン" },
+  { id: "bar", name: "バール・カフェ" },
+  { id: "shop", name: "買い物" },
+  { id: "move", name: "移動・道" },
+  { id: "hotel", name: "ホテル" },
+  { id: "help", name: "トラブル" },
+  { id: "sign", name: "看板・表示" }
+];
+
+// c: category, it: Italian, kn: reading, ja: meaning, nt: note, say: text to read aloud when it differs
+const DATA = [
+  { c: "greet", it: "Buongiorno", kn: "ボンジョルノ", ja: "こんにちは・おはよう", nt: "夕方まで使えるあいさつ" },
+  { c: "greet", it: "Buonasera", kn: "ボナセーラ", ja: "こんばんは", nt: "午後遅くから使う" },
+  { c: "greet", it: "Ciao", kn: "チャオ", ja: "やあ・バイバイ", nt: "親しい相手に。店員にはBuongiornoが無難" },
+  { c: "greet", it: "Arrivederci", kn: "アッリヴェデルチ", ja: "さようなら" },
+  { c: "greet", it: "Grazie", kn: "グラツィエ", ja: "ありがとう" },
+  { c: "greet", it: "Grazie mille", kn: "グラツィエ ミッレ", ja: "本当にありがとう" },
+  { c: "greet", it: "Prego", kn: "プレーゴ", ja: "どういたしまして・どうぞ" },
+  { c: "greet", it: "Per favore", kn: "ペル ファヴォーレ", ja: "お願いします" },
+  { c: "greet", it: "Scusi", kn: "スクーズィ", ja: "すみません", nt: "呼びかけにも謝罪にも使える" },
+  { c: "greet", it: "Sì", kn: "スィ", ja: "はい" },
+  { c: "greet", it: "No", kn: "ノ", ja: "いいえ" },
+  { c: "greet", it: "Non capisco", kn: "ノン カピスコ", ja: "わかりません" },
+  { c: "greet", it: "Parla inglese?", kn: "パルラ イングレーゼ", ja: "英語を話せますか?" },
+  { c: "greet", it: "Piacere", kn: "ピアチェーレ", ja: "はじめまして" },
+  { c: "greet", it: "Sono giapponese", kn: "ソーノ ジャッポネーゼ", ja: "私は日本人です" },
+
+  { c: "num", it: "uno", kn: "ウーノ", ja: "1" },
+  { c: "num", it: "due", kn: "ドゥーエ", ja: "2" },
+  { c: "num", it: "tre", kn: "トレ", ja: "3" },
+  { c: "num", it: "quattro", kn: "クアットロ", ja: "4" },
+  { c: "num", it: "cinque", kn: "チンクエ", ja: "5" },
+  { c: "num", it: "sei", kn: "セイ", ja: "6" },
+  { c: "num", it: "sette", kn: "セッテ", ja: "7" },
+  { c: "num", it: "otto", kn: "オット", ja: "8" },
+  { c: "num", it: "nove", kn: "ノーヴェ", ja: "9" },
+  { c: "num", it: "dieci", kn: "ディエチ", ja: "10" },
+  { c: "num", it: "venti", kn: "ヴェンティ", ja: "20" },
+  { c: "num", it: "cinquanta", kn: "チンクアンタ", ja: "50" },
+  { c: "num", it: "cento", kn: "チェント", ja: "100" },
+  { c: "num", it: "dodici euro", kn: "ドーディチ エウロ", ja: "12ユーロ", nt: "euroは「エウロ」と読む" },
+  { c: "num", it: "Sono le tre e mezza", kn: "ソーノ レ トレ エ メッツァ", ja: "3時半です" },
+
+  { c: "food", it: "Un tavolo per due, per favore", kn: "ウン ターヴォロ ペル ドゥーエ ペル ファヴォーレ", ja: "2人用の席をお願いします" },
+  { c: "food", it: "Il menù, per favore", kn: "イル メヌー ペル ファヴォーレ", ja: "メニューをお願いします" },
+  { c: "food", it: "Vorrei questo", kn: "ヴォッレイ クエスト", ja: "これをください", nt: "Vorrei + 名詞 で「〜が欲しいです」" },
+  { c: "food", it: "Che cosa mi consiglia?", kn: "ケ コーザ ミ コンスィッリア", ja: "おすすめは何ですか?" },
+  { c: "food", it: "Acqua naturale", kn: "アックア ナトゥラーレ", ja: "炭酸なしの水" },
+  { c: "food", it: "Acqua frizzante", kn: "アックア フリッザンテ", ja: "炭酸入りの水" },
+  { c: "food", it: "Un bicchiere di vino rosso", kn: "ウン ビッキエーレ ディ ヴィーノ ロッソ", ja: "赤ワインを1杯", nt: "白ワインは vino bianco" },
+  { c: "food", it: "Il conto, per favore", kn: "イル コント ペル ファヴォーレ", ja: "お会計をお願いします" },
+  { c: "food", it: "Era buonissimo", kn: "エーラ ブオニッスィモ", ja: "とてもおいしかったです" },
+  { c: "food", it: "Sono allergico alle noci", kn: "ソーノ アッレルジコ アッレ ノーチ", ja: "ナッツのアレルギーがあります", nt: "女性は allergica(アッレルジカ)" },
+  { c: "food", it: "Antipasto", kn: "アンティパスト", ja: "前菜" },
+  { c: "food", it: "Primo piatto", kn: "プリーモ ピアット", ja: "第一の皿(パスタ・リゾット)" },
+  { c: "food", it: "Secondo piatto", kn: "セコンド ピアット", ja: "メイン料理(肉・魚)" },
+  { c: "food", it: "Dolce", kn: "ドルチェ", ja: "デザート" },
+  { c: "food", it: "Coperto", kn: "コペルト", ja: "席料", nt: "会計に1人数ユーロ加算されるのが普通" },
+
+  { c: "bar", it: "Un caffè, per favore", kn: "ウン カッフェ ペル ファヴォーレ", ja: "エスプレッソを1杯ください", nt: "caffèと頼むとエスプレッソが出る" },
+  { c: "bar", it: "Un cappuccino", kn: "ウン カップッチーノ", ja: "カプチーノを1杯", nt: "現地では朝に飲むのが一般的" },
+  { c: "bar", it: "Un cornetto", kn: "ウン コルネット", ja: "クロワッサン(コルネット)" },
+  { c: "bar", it: "Al banco", kn: "アル バンコ", ja: "カウンターで(立ち飲み)", nt: "テーブル席より安いことが多い" },
+  { c: "bar", it: "Al tavolo", kn: "アル ターヴォロ", ja: "テーブル席で" },
+  { c: "bar", it: "Da portare via", kn: "ダ ポルターレ ヴィーア", ja: "持ち帰りで" },
+  { c: "bar", it: "Un cono con due gusti", kn: "ウン コーノ コン ドゥーエ グスティ", ja: "コーンで2種類の味(ジェラート)", nt: "カップは coppetta" },
+
+  { c: "shop", it: "Quanto costa?", kn: "クアント コスタ", ja: "いくらですか?" },
+  { c: "shop", it: "Posso provare?", kn: "ポッソ プロヴァーレ", ja: "試着できますか?", nt: "Posso + 動詞 で「〜してもいいですか」" },
+  { c: "shop", it: "Solo guardo, grazie", kn: "ソーロ グアルド グラツィエ", ja: "見ているだけです" },
+  { c: "shop", it: "Avete una taglia più grande?", kn: "アヴェーテ ウナ ターッリア ピウ グランデ", ja: "もっと大きいサイズはありますか?", nt: "小さいサイズは più piccola" },
+  { c: "shop", it: "Posso pagare con la carta?", kn: "ポッソ パガーレ コン ラ カルタ", ja: "カードで払えますか?" },
+  { c: "shop", it: "Lo prendo", kn: "ロ プレンド", ja: "これにします(買います)" },
+  { c: "shop", it: "È troppo caro", kn: "エ トロッポ カーロ", ja: "高すぎます" },
+  { c: "shop", it: "Lo scontrino, per favore", kn: "ロ スコントリーノ ペル ファヴォーレ", ja: "レシートをください" },
+
+  { c: "move", it: "Dov'è la stazione?", kn: "ドヴェ ラ スタツィオーネ", ja: "駅はどこですか?", nt: "Dov'è + 場所 で「〜はどこですか」" },
+  { c: "move", it: "Un biglietto per Firenze", kn: "ウン ビッリエット ペル フィレンツェ", ja: "フィレンツェまで切符を1枚" },
+  { c: "move", it: "Andata e ritorno", kn: "アンダータ エ リトルノ", ja: "往復", nt: "片道は solo andata" },
+  { c: "move", it: "A che ora parte il treno?", kn: "ア ケ オーラ パルテ イル トレーノ", ja: "電車は何時に出発しますか?" },
+  { c: "move", it: "Da quale binario?", kn: "ダ クアーレ ビナーリオ", ja: "何番線から出ますか?" },
+  { c: "move", it: "A destra", kn: "ア デストラ", ja: "右に" },
+  { c: "move", it: "A sinistra", kn: "ア スィニストラ", ja: "左に" },
+  { c: "move", it: "Sempre dritto", kn: "センプレ ドリット", ja: "ずっとまっすぐ" },
+  { c: "move", it: "È lontano?", kn: "エ ロンターノ", ja: "遠いですか?" },
+  { c: "move", it: "La fermata dell'autobus", kn: "ラ フェルマータ デッラウトブス", ja: "バス停" },
+  { c: "move", it: "Mi può chiamare un taxi?", kn: "ミ プオ キアマーレ ウン タクスィ", ja: "タクシーを呼んでもらえますか?" },
+
+  { c: "hotel", it: "Ho una prenotazione", kn: "オ ウナ プレノタツィオーネ", ja: "予約しています", nt: "hは発音しない" },
+  { c: "hotel", it: "A nome Tanaka", kn: "ア ノーメ タナカ", ja: "田中の名前で(予約しています)" },
+  { c: "hotel", it: "A che ora è la colazione?", kn: "ア ケ オーラ エ ラ コラツィオーネ", ja: "朝食は何時ですか?" },
+  { c: "hotel", it: "La chiave, per favore", kn: "ラ キアーヴェ ペル ファヴォーレ", ja: "鍵をお願いします" },
+  { c: "hotel", it: "Il Wi-Fi non funziona", kn: "イル ワイファイ ノン フンツィオーナ", ja: "Wi-Fiがつながりません", say: "Il wifi non funziona" },
+  { c: "hotel", it: "Posso lasciare i bagagli?", kn: "ポッソ ラッシャーレ イ バガッリ", ja: "荷物を預けられますか?" },
+  { c: "hotel", it: "A che ora è il check-out?", kn: "ア ケ オーラ エ イル チェックアウト", ja: "チェックアウトは何時ですか?" },
+
+  { c: "help", it: "Aiuto!", kn: "アイウート", ja: "助けて!" },
+  { c: "help", it: "Ho perso il passaporto", kn: "オ ペルソ イル パッサポルト", ja: "パスポートをなくしました" },
+  { c: "help", it: "Mi hanno rubato il portafoglio", kn: "ミ アンノ ルバート イル ポルタフォッリオ", ja: "財布を盗まれました" },
+  { c: "help", it: "Chiami la polizia!", kn: "キアーミ ラ ポリツィーア", ja: "警察を呼んでください!", nt: "緊急番号は 112" },
+  { c: "help", it: "Mi sento male", kn: "ミ セント マーレ", ja: "気分が悪いです" },
+  { c: "help", it: "Dov'è l'ospedale?", kn: "ドヴェ ロスペダーレ", ja: "病院はどこですか?" },
+  { c: "help", it: "Dov'è il bagno?", kn: "ドヴェ イル バーニョ", ja: "トイレはどこですか?" },
+  { c: "help", it: "Può ripetere, per favore?", kn: "プオ リペーテレ ペル ファヴォーレ", ja: "もう一度言ってもらえますか?" },
+  { c: "help", it: "Più piano, per favore", kn: "ピウ ピアーノ ペル ファヴォーレ", ja: "もっとゆっくりお願いします" },
+
+  { c: "sign", it: "Entrata", kn: "エントラータ", ja: "入口" },
+  { c: "sign", it: "Uscita", kn: "ウッシータ", ja: "出口" },
+  { c: "sign", it: "Binario", kn: "ビナーリオ", ja: "〜番線(ホーム)" },
+  { c: "sign", it: "Aperto", kn: "アペルト", ja: "営業中" },
+  { c: "sign", it: "Chiuso", kn: "キウーゾ", ja: "閉店・休業" },
+  { c: "sign", it: "Spingere", kn: "スピンジェレ", ja: "押す(ドア)" },
+  { c: "sign", it: "Tirare", kn: "ティラーレ", ja: "引く(ドア)" },
+  { c: "sign", it: "Vietato fumare", kn: "ヴィエタート フマーレ", ja: "禁煙" },
+  { c: "sign", it: "Biglietteria", kn: "ビッリエッテリーア", ja: "切符売り場" },
+  { c: "sign", it: "Partenze", kn: "パルテンツェ", ja: "出発" },
+  { c: "sign", it: "Arrivi", kn: "アッリーヴィ", ja: "到着" },
+  { c: "sign", it: "Convalidare", kn: "コンヴァリダーレ", ja: "(切符を)刻印する", nt: "紙の切符は乗る前に刻印機へ。忘れると罰金" },
+  { c: "sign", it: "Libero", kn: "リーベロ", ja: "空き" },
+  { c: "sign", it: "Occupato", kn: "オックパート", ja: "使用中" },
+  { c: "sign", it: "Saldi", kn: "サルディ", ja: "セール" }
+];
+
+const ICON_PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10v4h4l5 4V6L7 10H3zm13.5 2A4.5 4.5 0 0 0 14 8v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>';
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"']/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
+
+function load(key, fallback) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch (e) { return fallback; } }
+function save(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {} }
+
+const known = new Set(load("it-known", []));
+const st = {
+  tab: load("it-tab", "cards"),
+  cat: load("it-cat", "greet"),
+  dir: "it",
+  hideKnown: false,
+  idx: 0,
+  flipped: false,
+  deck: [],
+  mode: "ja"
+};
+
+/* ---------- speech ---------- */
+let itVoice = null;
+function loadVoices() {
+  if (!("speechSynthesis" in window)) { $("voiceWarn").hidden = false; return; }
+  const vs = speechSynthesis.getVoices();
+  itVoice = vs.find((v) => v.lang === "it-IT") || vs.find((v) => (v.lang || "").toLowerCase().startsWith("it")) || null;
+  $("voiceWarn").hidden = !(vs.length > 0 && !itVoice);
+}
+function speak(item, rateOverride) {
+  if (!("speechSynthesis" in window)) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(item.say || item.it);
+  u.lang = "it-IT";
+  if (itVoice) u.voice = itVoice;
+  u.rate = rateOverride || parseFloat($("rate").value) || 0.8;
+  speechSynthesis.speak(u);
+}
+if ("speechSynthesis" in window) { loadVoices(); speechSynthesis.onvoiceschanged = loadVoices; }
+else { $("voiceWarn").hidden = false; }
+
+/* ---------- shared ---------- */
+function inCat(cat) { return DATA.filter((x) => cat === "all" || x.c === cat); }
+function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+
+function renderChips() {
+  $("chips").innerHTML = CATS.map((c) =>
+    `<button class="chip" data-cat="${c.id}" aria-pressed="${c.id === st.cat}">${esc(c.name)}<small>${inCat(c.id).length}</small></button>`
+  ).join("");
+}
+$("chips").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-cat]"); if (!b) return;
+  st.cat = b.dataset.cat; save("it-cat", st.cat);
+  renderChips(); buildDeck(); newQuestion(true);
+});
+
+function setTab(t) {
+  st.tab = t; save("it-tab", t);
+  $("tab-cards").setAttribute("aria-selected", t === "cards");
+  $("tab-listen").setAttribute("aria-selected", t === "listen");
+  $("view-cards").hidden = t !== "cards";
+  $("view-listen").hidden = t !== "listen";
+  $("view-listen").style.display = t === "listen" ? "flex" : "";
+  if ("speechSynthesis" in window) speechSynthesis.cancel();
+}
+$("tab-cards").onclick = () => setTab("cards");
+$("tab-listen").onclick = () => setTab("listen");
+
+/* ---------- flashcards ---------- */
+function buildDeck(keepItem) {
+  let d = inCat(st.cat);
+  if (st.hideKnown) d = d.filter((x) => !known.has(x.it));
+  st.deck = d;
+  const pos = keepItem ? d.indexOf(keepItem) : -1;
+  st.idx = pos >= 0 ? pos : 0;
+  st.flipped = false;
+  renderCard(); renderList();
+}
+
+function renderCard() {
+  const card = $("card");
+  if (!st.deck.length) {
+    card.innerHTML = `<div class="empty">このカテゴリのフレーズはすべて「覚えた」になっています。<br>「覚えた単語を隠す」を外すと復習できます。</div>`;
+    return;
+  }
+  const it = st.deck[st.idx];
+  const isKnown = known.has(it.it);
+  const front = st.dir === "it"
+    ? `<div class="it" lang="it">${esc(it.it)}</div>`
+    : `<div class="ja-big">${esc(it.ja)}</div>`;
+  const back = st.dir === "it"
+    ? `<div class="ja">${esc(it.ja)}</div><div class="kana">${esc(it.kn)}</div>`
+    : `<div class="it" lang="it" style="font-size:clamp(22px,6vw,32px)">${esc(it.it)}</div><div class="kana">${esc(it.kn)}</div>`;
+  card.innerHTML = `
+    <div class="meta"><span>${String(st.idx + 1).padStart(2, "0")} / ${String(st.deck.length).padStart(2, "0")}</span>
+      <span>${esc(CATS.find((c) => c.id === it.c).name)}</span></div>
+    ${isKnown ? '<span class="pill known-tag">覚えた</span>' : ""}
+    <button class="flash" id="flip" aria-label="カードをめくる">
+      ${front}
+      ${st.flipped
+        ? `<div class="back">${back}${it.nt ? `<div class="note">${esc(it.nt)}</div>` : ""}</div>`
+        : `<div class="hint">タップして答えを見る</div>`}
+    </button>
+    <div class="controls">
+      <button class="btn" id="prev" aria-label="前のカード">←</button>
+      <button class="btn primary" id="play">${ICON_PLAY}再生</button>
+      <button class="btn lemon" id="mark" aria-pressed="${isKnown}">${isKnown ? "覚えた ✓" : "覚えた"}</button>
+      <button class="btn" id="next" aria-label="次のカード">→</button>
+    </div>
+    <div class="opts" style="justify-content:space-between">
+      <button class="btn" id="shuffle" style="min-height:36px;padding:6px 12px;font-size:13px">シャッフル</button>
+      <span class="hint">キーボード: ← → で移動、スペースでめくる、P で再生</span>
+    </div>`;
+  $("flip").onclick = flip;
+  $("prev").onclick = () => move(-1);
+  $("next").onclick = () => move(1);
+  $("play").onclick = () => speak(it);
+  $("mark").onclick = () => toggleKnown(it);
+  $("shuffle").onclick = () => { shuffle(st.deck); st.idx = 0; st.flipped = false; renderCard(); renderList(); };
+}
+function flip() {
+  st.flipped = !st.flipped; renderCard();
+  if (st.flipped && $("autoPlay").checked && st.deck[st.idx]) speak(st.deck[st.idx]);
+}
+function move(d) {
+  if (!st.deck.length) return;
+  st.idx = (st.idx + d + st.deck.length) % st.deck.length;
+  st.flipped = false; renderCard(); renderList();
+  if (st.dir === "it" && $("autoPlay").checked) speak(st.deck[st.idx]);
+}
+function toggleKnown(item) {
+  if (known.has(item.it)) known.delete(item.it); else known.add(item.it);
+  save("it-known", [...known]);
+  if (st.hideKnown && known.has(item.it)) {
+    const nextItem = st.deck[st.idx + 1] || st.deck[0];
+    buildDeck(nextItem === item ? null : nextItem);
+  } else { renderCard(); renderList(); }
+}
+
+function renderList() {
+  const items = inCat(st.cat);
+  const cur = st.deck[st.idx];
+  $("listTitle").textContent = `${CATS.find((c) => c.id === st.cat).name} の一覧`;
+  $("knownCount").textContent = `覚えた ${items.filter((x) => known.has(x.it)).length} / ${items.length}`;
+  $("list").innerHTML = items.map((x, i) => `
+    <div class="row${x === cur ? " current" : ""}">
+      <button class="icon-btn" data-say="${i}" aria-label="${esc(x.it)} を再生">${ICON_PLAY}</button>
+      <div><button class="jump" data-go="${i}"><div class="r-it" lang="it">${esc(x.it)}</div><div class="r-ja">${esc(x.ja)} ・ ${esc(x.kn)}</div></button></div>
+      <span class="dot${known.has(x.it) ? " on" : ""}" title="${known.has(x.it) ? "覚えた" : "未学習"}"></span>
+    </div>`).join("");
+}
+$("list").addEventListener("click", (e) => {
+  const items = inCat(st.cat);
+  const s = e.target.closest("[data-say]");
+  if (s) { speak(items[+s.dataset.say]); return; }
+  const g = e.target.closest("[data-go]");
+  if (g) {
+    const item = items[+g.dataset.go];
+    let pos = st.deck.indexOf(item);
+    if (pos < 0) { st.hideKnown = false; $("hideKnown").checked = false; buildDeck(item); pos = st.idx; }
+    st.idx = pos; st.flipped = true; renderCard(); renderList();
+    speak(item);
+    $("card").scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+});
+
+$("dirSeg").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-dir]"); if (!b) return;
+  st.dir = b.dataset.dir; st.flipped = false;
+  [...$("dirSeg").children].forEach((x) => x.setAttribute("aria-pressed", x === b));
+  renderCard();
+});
+$("hideKnown").onchange = (e) => { st.hideKnown = e.target.checked; buildDeck(st.deck[st.idx]); };
+
+document.addEventListener("keydown", (e) => {
+  if (e.target.matches("input, select, textarea")) return;
+  if (st.tab === "cards") {
+    if (e.key === "ArrowRight") move(1);
+    else if (e.key === "ArrowLeft") move(-1);
+    else if (e.key === " " && !e.target.closest("button")) { e.preventDefault(); flip(); }
+    else if (e.key.toLowerCase() === "p" && st.deck[st.idx]) speak(st.deck[st.idx]);
+  } else {
+    if (["1", "2", "3", "4"].includes(e.key)) answer(+e.key - 1);
+    else if (e.key.toLowerCase() === "p" && q.item) speak(q.item);
+    else if (e.key === "Enter" && q.answered) { e.preventDefault(); newQuestion(); }
+  }
+});
+
+/* ---------- listening quiz ---------- */
+const q = { item: null, choices: [], answered: false, picked: -1, right: 0, total: 0, streak: 0, last: null, misses: [], plays: 0 };
+
+function newQuestion(reset) {
+  const pool = inCat(st.cat);
+  let cand = pool.filter((x) => x !== q.last);
+  if (!cand.length) cand = pool;
+  // missed phrases come back more often
+  const missedHere = q.misses.filter((m) => pool.includes(m) && m !== q.last);
+  q.item = missedHere.length && Math.random() < 0.35
+    ? missedHere[Math.floor(Math.random() * missedHere.length)]
+    : cand[Math.floor(Math.random() * cand.length)];
+  q.last = q.item;
+  const key = (x) => (st.mode === "ja" ? x.ja : x.it);
+  let others = shuffle(pool.filter((x) => key(x) !== key(q.item)));
+  if (others.length < 3) others = others.concat(shuffle(DATA.filter((x) => key(x) !== key(q.item) && !others.includes(x))));
+  q.choices = shuffle([q.item, ...others.slice(0, 3)]);
+  q.answered = false; q.picked = -1; q.plays = 0;
+  renderQuiz();
+  if (!reset && st.tab === "listen") { speak(q.item); q.plays = 1; }
+}
+
+function renderQuiz() {
+  const it = q.item;
+  const ok = q.answered && q.choices[q.picked] === it;
+  $("quiz").innerHTML = `
+    <div class="meta"><span>Q${String(q.total + (q.answered ? 0 : 1)).padStart(2, "0")}</span><span>${esc(CATS.find((c) => c.id === st.cat).name)}</span></div>
+    <div class="listen-row">
+      <button class="btn primary big" id="qPlay">${ICON_PLAY}${q.plays ? "もう一度聞く" : "音声を聞く"}</button>
+      <button class="btn big" id="qSlow">ゆっくり</button>
+    </div>
+    <div class="choices">
+      ${q.choices.map((c, i) => {
+        let cls = st.mode === "it" ? "choice itc" : "choice";
+        if (q.answered && c === it) cls += " right";
+        else if (q.answered && i === q.picked) cls += " wrong";
+        return `<button class="${cls}" data-ans="${i}" ${q.answered ? "disabled" : ""}><span class="k">${i + 1}</span><span class="t"${st.mode === "it" ? ' lang="it"' : ""}>${esc(st.mode === "ja" ? c.ja : c.it)}</span></button>`;
+      }).join("")}
+    </div>
+    ${q.answered ? `
+      <div class="result ${ok ? "ok" : "ng"}">
+        <span class="verdict">${ok ? "正解" : "不正解"}</span>
+        <div class="it" lang="it" style="font-size:24px">${esc(it.it)}</div>
+        <div class="kana">${esc(it.kn)}</div>
+        <div>${esc(it.ja)}</div>
+        ${it.nt ? `<div class="note">${esc(it.nt)}</div>` : ""}
+      </div>
+      <button class="btn primary" id="qNext">次の問題へ</button>` : `<div class="hint" style="text-align:center">音声を聞いて、${st.mode === "ja" ? "意味" : "正しいつづり"}を選んでください。キーボードの 1〜4 でも答えられます。</div>`}`;
+  $("qPlay").onclick = () => { speak(it); q.plays++; if (q.plays === 1) renderQuiz(); };
+  $("qSlow").onclick = () => { speak(it, 0.5); };
+  if (q.answered) $("qNext").onclick = () => newQuestion();
+  $("quiz").querySelectorAll("[data-ans]").forEach((b) => (b.onclick = () => answer(+b.dataset.ans)));
+}
+
+function answer(i) {
+  if (q.answered || !q.choices[i]) return;
+  q.answered = true; q.picked = i; q.total++;
+  if (q.choices[i] === q.item) {
+    q.right++; q.streak++;
+    q.misses = q.misses.filter((m) => m !== q.item);
+  } else {
+    q.streak = 0;
+    if (!q.misses.includes(q.item)) q.misses.unshift(q.item);
+  }
+  renderQuiz(); renderScore();
+}
+
+function renderScore() {
+  $("sRight").textContent = `${q.right}/${q.total}`;
+  $("sRate").textContent = q.total ? Math.round((q.right / q.total) * 100) + "%" : "–";
+  $("sStreak").textContent = q.streak;
+  $("missBox").hidden = !q.misses.length;
+  $("missCount").textContent = `${q.misses.length} 件`;
+  $("missList").innerHTML = q.misses.map((x, i) => `
+    <div class="row">
+      <button class="icon-btn" data-miss="${i}" aria-label="${esc(x.it)} を再生">${ICON_PLAY}</button>
+      <div><div class="r-it" lang="it">${esc(x.it)}</div><div class="r-ja">${esc(x.ja)} ・ ${esc(x.kn)}</div></div>
+      <span></span>
+    </div>`).join("");
+}
+$("missList").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-miss]"); if (b) speak(q.misses[+b.dataset.miss]);
+});
+
+$("modeSeg").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-mode]"); if (!b) return;
+  st.mode = b.dataset.mode;
+  [...$("modeSeg").children].forEach((x) => x.setAttribute("aria-pressed", x === b));
+  newQuestion(true);
+});
+
+/* ---------- start ---------- */
+if (!CATS.some((c) => c.id === st.cat)) st.cat = "greet";
+renderChips();
+buildDeck();
+newQuestion(true);
+renderScore();
+setTab(st.tab === "listen" ? "listen" : "cards");
+</script>
+</body>
+</html>
